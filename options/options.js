@@ -34,10 +34,12 @@ async function render() {
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = cat.enabled;
+    checkbox.setAttribute("aria-label", `Enable ${cat.label}`);
     checkbox.addEventListener("change", () => updateCategory(cat, cat.custom, { enabled: checkbox.checked }));
     tdCheck.append(checkbox);
 
-    const tdName = document.createElement("td");
+    const tdName = document.createElement("th");
+    tdName.scope = "row";
     tdName.textContent = cat.label;
     if (cat.custom) {
       const tag = document.createElement("span");
@@ -48,6 +50,7 @@ async function render() {
 
     const tdIntensity = document.createElement("td");
     const select = intensitySelect(cat.intensity);
+    select.setAttribute("aria-label", `Intensity for ${cat.label}`);
     select.addEventListener("change", () => updateCategory(cat, cat.custom, { intensity: select.value }));
     tdIntensity.append(select);
 
@@ -57,6 +60,7 @@ async function render() {
       removeBtn.type = "button";
       removeBtn.className = "btn-remove";
       removeBtn.textContent = "Remove";
+      removeBtn.setAttribute("aria-label", `Remove ${cat.label}`);
       removeBtn.addEventListener("click", () => removeCustomCategory(cat.id));
       tdActions.append(removeBtn);
     }

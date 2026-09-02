@@ -36,6 +36,7 @@ async function render() {
     els.siteRow.hidden = false;
     els.siteHost.textContent = host;
     els.siteToggle.checked = !settings.disabledSites.includes(host);
+    els.siteToggle.setAttribute("aria-label", `Shield on ${host}`);
     els.siteToggle.onchange = () => setSiteEnabled(host, els.siteToggle.checked);
   } else {
     els.siteRow.hidden = true;

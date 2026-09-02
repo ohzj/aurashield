@@ -12,7 +12,7 @@
       <span class="brand-name">AuraShield</span>
     </div>
     <label class="switch">
-      <input type="checkbox" id="master-toggle" />
+      <input type="checkbox" id="master-toggle" aria-label="Shield enabled" />
       <span class="switch-track"><span class="switch-thumb"></span></span>
     </label>
   </header>
@@ -25,7 +25,7 @@
   <section class="site-row" id="site-row" hidden>
     <span class="site-label">Shield on <strong id="site-host"></strong></span>
     <label class="switch">
-      <input type="checkbox" id="site-toggle" />
+      <input type="checkbox" id="site-toggle" aria-label="Shield on this site" />
       <span class="switch-track"><span class="switch-thumb"></span></span>
     </label>
   </section>
@@ -33,7 +33,7 @@
   <section class="ai-status" id="ai-status">
     <p class="ai-status-text" id="ai-status-text">Checking on-device AI…</p>
     <button type="button" class="btn-primary" id="ai-enable-btn" hidden>Enable on-device AI</button>
-    <progress class="ai-progress" id="ai-progress" max="100" value="0" hidden></progress>
+    <progress class="ai-progress" id="ai-progress" max="100" value="0" aria-label="On-device model download progress" hidden></progress>
   </section>
 
   <section class="categories" aria-label="Quick category toggles">

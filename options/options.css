@@ -7,11 +7,23 @@
   --accent: #2f6b5e;
   --accent-strong: #1e5347;
   --accent-soft: #dceae5;
-  --urgent: #b14a2a;
+  --urgent: #8a3a1e; /* darkened from #b14a2a - that was 4.22:1 on --urgent-soft, under the 4.5:1 AA minimum */
   --urgent-soft: #f5dfd4;
 }
 
 * { box-sizing: border-box; }
+
+/* A single consistent focus-visible ring for every interactive control on
+   this page - the custom-form fields had one already, but the category
+   table's checkboxes/selects and the primary/link/remove buttons didn't,
+   falling back inconsistently to the UA default ring. */
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 
 body {
   margin: 0;
@@ -58,7 +70,7 @@ body {
 .ai-progress[hidden] { display: none; }
 
 .cat-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
-.cat-table th {
+.cat-table thead th {
   text-align: left;
   font-size: 11px;
   text-transform: uppercase;
@@ -67,8 +79,18 @@ body {
   padding: 6px 8px;
   border-bottom: 1px solid var(--line);
 }
-.cat-table td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
-.cat-table tr:last-child td { border-bottom: none; }
+/* The category-name cell is a <th scope="row"> for table-navigation
+   accessibility (so a screen reader announces which category a row's
+   checkbox/select belong to), but should look like an ordinary body cell,
+   not a header. */
+.cat-table td, .cat-table tbody th {
+  padding: 8px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+  text-align: left;
+  font-weight: 400;
+}
+.cat-table tr:last-child td, .cat-table tr:last-child th { border-bottom: none; }
 .cat-table input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
 .cat-table select {
   font: inherit;

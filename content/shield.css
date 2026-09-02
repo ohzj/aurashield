@@ -27,7 +27,12 @@
   }
 }
 
-/* ---- Gentle: peek-through blur, no overlay card ---- */
+/* ---- Gentle: peek-through blur + a small, always-present corner badge.
+   Deliberately the lightest touch: content stays pointer-interactive even
+   before reveal (no pointer-events: none), so the badge is compact rather
+   than a full centered card. It still needs to always exist, not just
+   display:none - without it, a keyboard or touch user has no way to
+   reveal content whose blur never clears via hover/focus-within. ---- */
 .aurashield-wrap.aurashield-gentle > *:not(.aurashield-overlay) {
   filter: blur(4px);
 }
@@ -36,7 +41,15 @@
   filter: blur(0);
 }
 .aurashield-wrap.aurashield-gentle .aurashield-overlay {
-  display: none;
+  position: absolute;
+  inset: auto 8px 8px auto;
+  padding: 3px 10px;
+  font-size: 11px;
+  border-radius: 999px;
+}
+.aurashield-wrap.aurashield-gentle .aurashield-reveal {
+  padding: 3px 9px;
+  font-size: 11px;
 }
 
 /* ---- Balanced: full blur + centered card, default level ---- */
@@ -51,8 +64,15 @@
   display: flex;
 }
 
-/* ---- Strict: fully hidden, collapses to a slim clickable strip ---- */
-.aurashield-wrap.aurashield-strict > *:not(.aurashield-overlay) {
+/* ---- Strict: fully hidden, collapses to a slim clickable strip.
+   :not(.aurashield-revealed) here (rather than a separate override on
+   reveal) means revealing just stops this rule from matching - the
+   element's own display value, whatever the host page set it to, applies
+   again untouched. Forcing "display: revert" on reveal was tried first and
+   is wrong: revert falls back to the *user-agent* default, not the site's
+   value, which visibly breaks custom elements the site had set to e.g.
+   flex or inline-block. ---- */
+.aurashield-wrap.aurashield-strict:not(.aurashield-revealed) > *:not(.aurashield-overlay) {
   display: none;
 }
 .aurashield-wrap.aurashield-strict .aurashield-overlay {
@@ -66,7 +86,6 @@
 .aurashield-wrap.aurashield-revealed > *:not(.aurashield-overlay) {
   filter: none !important;
   pointer-events: auto !important;
-  display: revert !important;
 }
 .aurashield-wrap.aurashield-revealed .aurashield-overlay {
   display: none !important;
@@ -123,7 +142,6 @@
 .aurashield-reveal:hover {
   background: #1e5347;
 }
-.aurashield-overlay:focus-visible,
 .aurashield-reveal:focus-visible {
   outline: 2px solid #2f6b5e;
   outline-offset: 2px;

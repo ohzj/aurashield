@@ -19,7 +19,11 @@ new Function(
 )(scope);
 
 const { BUILTIN_CATEGORIES, compileCategories, matchKeywords } = scope;
-const compiled = compileCategories(BUILTIN_CATEGORIES);
+// Force every category "on" for these cases - this file is testing whether
+// the keyword/exclusion patterns themselves are correct, not which
+// categories ship enabled by default (that's a separate, deliberate product
+// decision - see the "enabled: false" comment on health-anxiety).
+const compiled = compileCategories(BUILTIN_CATEGORIES.map((c) => ({ ...c, enabled: true })));
 
 const cases = [
   ["Democrats shocked after 2 members cross aisle to help Republicans", "politics", "plural forms (Republicans/Democrats) must match singular keywords"],

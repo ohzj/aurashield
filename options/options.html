@@ -19,7 +19,7 @@
       <h2>On-device AI</h2>
       <p class="ai-status-text" id="ai-status-text">Checking on-device AI…</p>
       <button type="button" class="btn-primary" id="ai-enable-btn" hidden>Enable on-device AI</button>
-      <progress class="ai-progress" id="ai-progress" max="100" value="0" hidden></progress>
+      <progress class="ai-progress" id="ai-progress" max="100" value="0" aria-label="On-device model download progress" hidden></progress>
     </section>
 
     <section class="card">
@@ -27,7 +27,7 @@
       <p class="hint">Toggle a category on, and choose how far its dial goes: Gentle just blurs, Strict hides completely (but always leaves a "N items shielded" strip you can expand).</p>
       <table class="cat-table" id="category-table">
         <thead>
-          <tr><th>Enabled</th><th>Category</th><th>Intensity</th><th></th></tr>
+          <tr><th scope="col">Enabled</th><th scope="col">Category</th><th scope="col">Intensity</th><th scope="col">Actions</th></tr>
         </thead>
         <tbody id="category-tbody"></tbody>
       </table>

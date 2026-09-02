@@ -41,7 +41,12 @@ export const BUILTIN_CATEGORIES = [
       "symptom", "diagnosis", "tumor", "cancer risk", "disease outbreak",
       "you might have", "warning signs of", "could be a sign of", "rare disease",
     ],
-    enabled: true,
+    // Off by default: this category's own keywords ("symptom", "diagnosis")
+    // are exactly the headings on a patient portal or a medical reference
+    // page someone navigated to on purpose. Shielding health information by
+    // default, on a health-themed product, is the wrong default even
+    // though the category itself is legitimate for someone who wants it.
+    enabled: false,
     intensity: "gentle",
     builtin: true,
   },
