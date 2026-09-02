@@ -45,6 +45,21 @@ Two filtering stages, both entirely on-device:
   "what" the actual content was. Capped at the last 2000 events; a
   **Clear history** button in the options page wipes it immediately.
 
+## Guardrails on the AI stage itself
+
+Page content fed into the on-device classifier is untrusted input — a page
+could try to manipulate its own classification by embedding text that reads
+as new instructions. Two layers address this: the snippet is wrapped in
+`<<<SNIPPET>>>`/`<<<END SNIPPET>>>` markers rather than a bare quoted string
+(nothing in ordinary page text can close that early), and the model's system
+prompt explicitly instructs it to treat everything inside those markers as
+data to classify, never as instructions, regardless of what it appears to
+say. The classifier's output is separately bounded to a closed set of your
+own category ids via a JSON-schema response constraint, so even a
+successful manipulation could only ever produce one of your own labels or
+"none" — never arbitrary text, never an escape from the classification task
+itself.
+
 ## The one honest caveat
 
 This is a guarantee about *processing location*, not about *what gets read*.
