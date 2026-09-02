@@ -82,6 +82,19 @@ shared/                     Category defaults, chrome.storage helpers, AI-availa
                              (used by popup/options/onboarding, not by content/shield.js)
 ```
 
+## Testing
+
+```
+npm test
+```
+
+Runs the suite in `tests/` via Node's built-in test runner — keyword/exclusion
+matching, storage reconciliation, the AI-classifier session queue, and a
+structural check that `shared/categories.js` hasn't drifted from the copy
+inlined in `content/shield.js` (see Project layout above for why that copy
+exists). The pure-logic tests extract real slices of `content/shield.js`'s
+source rather than reimplementing it, so they exercise the actual shipped code.
+
 ## Privacy
 
 `chrome.storage.local` only. No network requests ever carry page text —

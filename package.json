@@ -1,0 +1,11 @@
+{
+  "name": "aurashield",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "A personal, reversible filter for the web - a dial for what you see, not a wall.",
+  "scripts": {
+    "test": "node --test"
+  },
+  "license": "MIT"
+}
