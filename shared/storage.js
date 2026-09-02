@@ -1,6 +1,12 @@
 import { BUILTIN_CATEGORIES } from "./categories.js";
 
-const todayKey = () => new Date().toISOString().slice(0, 10);
+// Local date, not UTC - toISOString().slice(0,10) rolls the "day" over at
+// UTC midnight, which is 8pm Eastern. Every "today" claim in the UI was
+// wrong for most of the world for most of the day.
+const todayKey = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
 
 export const DEFAULT_SETTINGS = {
   enabled: true,
@@ -9,6 +15,11 @@ export const DEFAULT_SETTINGS = {
   disabledSites: [],
   stats: { date: todayKey(), count: 0 },
 };
+
+// Caps how many shield events are remembered for the insights view - old
+// entries are dropped once this is exceeded rather than growing forever.
+// Never stores the shielded text itself, only category/site/time metadata.
+const MAX_HISTORY_ENTRIES = 2000;
 
 // chrome.storage.local persists whatever was written on first install
 // forever - a code change to a builtin category's keywords/label/aiHint
@@ -38,11 +49,62 @@ export async function saveSettings(partial) {
   await chrome.storage.local.set(partial);
 }
 
+// Every mutating storage operation below is a read-modify-write against the
+// same chrome.storage.local keys. Two of these firing concurrently (e.g. a
+// burst of shields in a busy feed, each sending its own runtime message)
+// would otherwise interleave: both read the same starting value, and
+// whichever writes last wins, silently losing the other's update. Routing
+// every write through one promise chain makes them run one at a time.
+let writeQueue = Promise.resolve();
+function serializeWrite(fn) {
+  const run = writeQueue.then(fn);
+  writeQueue = run.catch(() => {});
+  return run;
+}
+
 export async function incrementShieldedCount() {
-  const { stats } = await getSettings();
-  const next = { date: todayKey(), count: stats.count + 1 };
-  await chrome.storage.local.set({ stats: next });
-  return next;
+  return serializeWrite(async () => {
+    const { stats } = await getSettings();
+    const next = { date: todayKey(), count: stats.count + 1 };
+    await chrome.storage.local.set({ stats: next });
+    return next;
+  });
+}
+
+export async function getHistory() {
+  const { history } = await chrome.storage.local.get({ history: [] });
+  return history;
+}
+
+// entry: { id, ts, categoryId, hostname, source, revealed }. Deliberately
+// never includes the shielded text or URL - see the comment on
+// MAX_HISTORY_ENTRIES above.
+export async function appendHistoryEntry(entry) {
+  return serializeWrite(async () => {
+    const history = await getHistory();
+    history.push(entry);
+    if (history.length > MAX_HISTORY_ENTRIES) history.splice(0, history.length - MAX_HISTORY_ENTRIES);
+    await chrome.storage.local.set({ history });
+    return history;
+  });
+}
+
+export async function markRevealed(id) {
+  return serializeWrite(async () => {
+    const history = await getHistory();
+    const idx = history.findIndex((e) => e.id === id);
+    if (idx !== -1) {
+      history[idx] = { ...history[idx], revealed: true };
+      await chrome.storage.local.set({ history });
+    }
+    return history;
+  });
+}
+
+export async function clearHistory() {
+  return serializeWrite(async () => {
+    await chrome.storage.local.set({ history: [] });
+  });
 }
 
 export function onSettingsChanged(callback) {

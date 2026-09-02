@@ -51,6 +51,22 @@ body {
 .card h2 { margin: 0 0 10px; font-size: 15px; }
 .hint { color: var(--ink-soft); font-size: 12.5px; margin: 0 0 14px; max-width: 60ch; }
 
+.insights-grid { display: flex; gap: 14px; margin-bottom: 12px; }
+.insight-stat {
+  flex: 1;
+  background: var(--ground);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.insight-num { font-size: 24px; font-weight: 700; color: var(--accent-strong); font-variant-numeric: tabular-nums; }
+.insight-label { font-size: 12px; color: var(--ink-soft); }
+.insight-detail { margin: 0 0 6px; font-size: 13px; color: var(--ink-soft); }
+.insight-detail:empty { display: none; }
+
 .ai-status-text { margin: 0; font-size: 13px; color: var(--ink-soft); }
 #ai-status.unsupported .ai-status-text, #ai-status.unavailable .ai-status-text { color: var(--urgent); }
 .btn-primary {

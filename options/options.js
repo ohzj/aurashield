@@ -1,10 +1,12 @@
-import { getSettings, saveSettings } from "../shared/storage.js";
+import { getSettings, saveSettings, getHistory, clearHistory } from "../shared/storage.js";
 import { BUILTIN_CATEGORIES, INTENSITIES } from "../shared/categories.js";
 import { checkAvailability } from "../shared/ai-status.js";
+import { computeInsights } from "../shared/insights.js";
 
 const tbody = document.getElementById("category-tbody");
 const form = document.getElementById("custom-form");
 const resetBtn = document.getElementById("reset-btn");
+const clearHistoryBtn = document.getElementById("clear-history-btn");
 
 function intensitySelect(current) {
   const select = document.createElement("select");
@@ -180,5 +182,42 @@ aiEnableBtn.addEventListener("click", async () => {
   }
 });
 
+// ---- Insights ----
+const insightTotal = document.getElementById("insight-total");
+const insightRevealRate = document.getElementById("insight-reveal-rate");
+const insightTopCategory = document.getElementById("insight-top-category");
+const insightLateNight = document.getElementById("insight-late-night");
+
+async function renderInsights() {
+  const [settings, history] = await Promise.all([getSettings(), getHistory()]);
+  const allCategories = [...settings.categories, ...settings.customCategories];
+  const labelFor = (id) => allCategories.find((c) => c.id === id)?.label || id;
+
+  const insights = computeInsights(history);
+
+  insightTotal.textContent = insights.totalThisWeek;
+  // Framed as a signal about whether shielding is actually helping, not just
+  // a tally - a low reveal rate says a category is serving the user; a high
+  // one says it's mostly adding friction.
+  insightRevealRate.textContent =
+    insights.revealRate === null ? "—" : `${Math.round(insights.revealRate * 100)}%`;
+
+  insightTopCategory.textContent = insights.topCategory
+    ? `Most shielded: ${labelFor(insights.topCategory.categoryId)} (${insights.topCategory.count})`
+    : "";
+
+  insightLateNight.textContent =
+    insights.lateNightCount > 0
+      ? `${insights.lateNightCount} of those (${Math.round(insights.lateNightShare * 100)}%) were between 10pm and 2am`
+      : "";
+}
+
+clearHistoryBtn.addEventListener("click", async () => {
+  if (!confirm("Clear your local shield history? This can't be undone.")) return;
+  await clearHistory();
+  renderInsights();
+});
+
 render();
 renderAiStatus();
+renderInsights();

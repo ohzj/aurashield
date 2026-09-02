@@ -15,6 +15,24 @@
       </div>
     </header>
 
+    <section class="card" id="insights">
+      <h2>This week</h2>
+      <p class="hint">Local to this device only - nothing here is ever sent anywhere. See the Privacy section in the README for how to verify that yourself.</p>
+      <div class="insights-grid">
+        <div class="insight-stat">
+          <span class="insight-num" id="insight-total">0</span>
+          <span class="insight-label">items shielded</span>
+        </div>
+        <div class="insight-stat">
+          <span class="insight-num" id="insight-reveal-rate">—</span>
+          <span class="insight-label">revealed when shown</span>
+        </div>
+      </div>
+      <p class="insight-detail" id="insight-top-category"></p>
+      <p class="insight-detail" id="insight-late-night"></p>
+      <button type="button" class="btn-link" id="clear-history-btn">Clear history</button>
+    </section>
+
     <section class="card" id="ai-status">
       <h2>On-device AI</h2>
       <p class="ai-status-text" id="ai-status-text">Checking on-device AI…</p>

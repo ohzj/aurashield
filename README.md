@@ -70,7 +70,7 @@ filtering with the keyword stage and says so plainly in the UI.
 
 ```
 manifest.json              Manifest V3 config
-background/                Service worker: defaults, stats badge, onboarding tab
+background/                Service worker: defaults, stats badge, history log, onboarding tab
 content/
   shield.js                   the content script: scanning, keyword + AI matching, blur/hide UI
                                (one plain script - static content_scripts entries can't use
@@ -78,8 +78,9 @@ content/
   shield.css                  blur/hide treatment styles
 popup/, options/,           Extension UI - regular extension pages, so these *can* use
 onboarding/                 <script type="module"> and import from shared/
-shared/                     Category defaults, chrome.storage helpers, AI-availability check
-                             (used by popup/options/onboarding, not by content/shield.js)
+shared/                     Category defaults, chrome.storage helpers, AI-availability check,
+                             insights computation (used by popup/options/onboarding/background,
+                             not by content/shield.js)
 ```
 
 ## Testing
@@ -95,26 +96,64 @@ inlined in `content/shield.js` (see Project layout above for why that copy
 exists). The pure-logic tests extract real slices of `content/shield.js`'s
 source rather than reimplementing it, so they exercise the actual shipped code.
 
+## Insights
+
+The options page's "This week" card turns the shield count into something
+closer to self-knowledge than a tally: how many items were revealed after
+being shown (a low reveal rate means a category is actually serving you; a
+high one means it's mostly adding friction), your most-shielded category and
+site this week, and how much of it happened between 10pm and 2am — the
+window the sleep research in the pitch is about.
+
+This is backed by a local history log (`shared/insights.js` computes the
+numbers, `shared/storage.js` stores the log) that records, per shield event:
+a timestamp, the category, the site's hostname, whether the keyword or AI
+stage matched it, and whether you revealed it. **It never records the
+shielded text itself or the page's URL** — only enough to answer "when" and
+"what kind", never "what". Capped at the last 2000 events, oldest dropped
+first. A **Clear history** button in the options page wipes it immediately.
+
 ## Privacy
 
-`chrome.storage.local` only. No network requests ever carry page text —
-both filtering stages run entirely inside the browser.
+**Claim: no page content you read is ever sent anywhere.** Verify it
+yourself rather than take our word for it — `grep -rE "fetch\(|XMLHttpRequest|sendBeacon|WebSocket" --include=*.js .`
+returns nothing, because there's nothing to find: `manifest.json` declares no
+`host_permissions` (a cross-origin request would be blocked even if the code
+tried), no CSP override (so Manifest V3's default `script-src 'self'`
+applies — no remote code can load), and everything persists to
+`chrome.storage.local`, never `.sync`. The one network call the product can
+ever cause is Chrome's own one-time Gemini Nano model *download*, which you
+trigger explicitly by clicking "Enable on-device AI" — that's Chrome fetching
+a model, never your page text being uploaded.
+
+The honest caveat: this is a guarantee about *processing location*, not about
+*what gets read*. The content script does read the text of every http/https
+page you visit to check it against your categories — that's the whole
+mechanism — it just never leaves your device. One deliberate, non-negotiable
+exception either way: crisis and harm-reduction sites (988lifeline.org,
+crisistextline.org, findtreatment.gov, and similar — see `NEVER_SHIELD_HOSTS`
+in `content/shield.js`) are never shielded, regardless of what categories
+you've enabled. A wellbeing filter should not be able to hide the help
+someone is actively looking for.
 
 ## Known limitations
 
 - **Site adapters were verified live** against X, Reddit (new), YouTube, and
-  Google News as of this writing — but all three of X/YouTube/Google News
-  had already changed their DOM since this project's original assumptions
-  were written, once. Frontends drift; if a site stops matching, the fix is
-  to re-inspect its current DOM and update `content/shield.js`'s `ADAPTERS`
-  entry for it, not to assume the old selector still holds.
+  Google News — three of those four (X, YouTube, Google News) had already
+  changed their DOM since this project's original assumptions were written,
+  once. Frontends drift; if a site stops matching, the fix is to re-inspect
+  its current DOM and update `content/shield.js`'s `ADAPTERS` entry for it,
+  not to assume the old selector still holds.
 - **old.reddit.com's adapter is untested** — the site now requires a login
   even for public subreddits, which blocked live verification. Its
   `.thing .title a.title` selector targets Reddit's long-stable legacy
   markup, so it's a reasonable bet, just not empirically confirmed here.
-- **Strict-intensity visual treatment is code-reviewed but not
-  browser-verified** — it shares the same wrap/overlay/reveal mechanism
-  already confirmed working for Gentle and Balanced, just with different
-  CSS (`display: none` instead of blur). Worth a manual check: enable a
-  Strict category (Spoilers or Violence) in the options page and confirm
-  a match collapses to a clickable strip.
+- **A large safety/stability/accessibility pass (crisis-site exclusions,
+  the generic adapter no longer using the AI stage, the AI session-lifecycle
+  and recycled-DOM-node fixes, aria-hidden/inert, the reveal layout fix) is
+  unit-tested (35+ tests, all passing) but the next step is a fresh
+  live-verification pass in a real loaded extension** to confirm it holds up
+  the same way outside the test sandbox - the same discipline that caught
+  the site-adapter drift above and several other real bugs earlier in this
+  project. Don't take "tests pass" as "verified working" until that pass is
+  done.

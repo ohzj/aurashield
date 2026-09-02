@@ -118,7 +118,13 @@
   }
 
   // ---- shared/storage.js ------------------------------------------------
-  const todayKey = () => new Date().toISOString().slice(0, 10);
+  // Local date, not UTC - toISOString().slice(0,10) rolls the "day" over at
+  // UTC midnight, which is 8pm Eastern. Every "today" claim in the UI was
+  // wrong for most of the world for most of the day.
+  const todayKey = () => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
 
   const DEFAULT_SETTINGS = {
     enabled: true,
@@ -461,6 +467,12 @@
     overlay.append(icon, text, reveal);
     wrap.appendChild(overlay);
 
+    // Identifies this specific shield event so a later reveal can be
+    // matched back to it in the history log (see shared/insights.js) -
+    // never anything derived from the shielded text itself.
+    const eventId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+    let revealSent = false;
+
     const doReveal = (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -471,13 +483,27 @@
       // back to <body> with no indication the reveal worked.
       el.setAttribute("tabindex", "-1");
       el.focus({ preventScroll: true });
+
+      if (!revealSent) {
+        revealSent = true;
+        chrome.runtime.sendMessage({ type: "SHIELD_REVEALED", id: eventId }).catch(() => {});
+      }
     };
     reveal.addEventListener("click", doReveal);
     // A click anywhere on the card (not just the button) also reveals - the
     // button's own listener calls stopPropagation, so this never double-fires.
     overlay.addEventListener("click", doReveal);
 
-    chrome.runtime.sendMessage({ type: "SHIELD_INCREMENT", category, source }).catch(() => {});
+    chrome.runtime
+      .sendMessage({
+        type: "SHIELD_INCREMENT",
+        id: eventId,
+        category,
+        source,
+        hostname: location.hostname,
+        ts: Date.now(),
+      })
+      .catch(() => {});
   }
 
   // Restores an element to its pre-shield state: unwraps it, clears every
