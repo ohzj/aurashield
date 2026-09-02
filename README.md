@@ -115,26 +115,12 @@ first. A **Clear history** button in the options page wipes it immediately.
 
 ## Privacy
 
-**Claim: no page content you read is ever sent anywhere.** Verify it
-yourself rather than take our word for it — `grep -rE "fetch\(|XMLHttpRequest|sendBeacon|WebSocket" --include=*.js .`
-returns nothing, because there's nothing to find: `manifest.json` declares no
-`host_permissions` (a cross-origin request would be blocked even if the code
-tried), no CSP override (so Manifest V3's default `script-src 'self'`
-applies — no remote code can load), and everything persists to
-`chrome.storage.local`, never `.sync`. The one network call the product can
-ever cause is Chrome's own one-time Gemini Nano model *download*, which you
-trigger explicitly by clicking "Enable on-device AI" — that's Chrome fetching
-a model, never your page text being uploaded.
-
-The honest caveat: this is a guarantee about *processing location*, not about
-*what gets read*. The content script does read the text of every http/https
-page you visit to check it against your categories — that's the whole
-mechanism — it just never leaves your device. One deliberate, non-negotiable
-exception either way: crisis and harm-reduction sites (988lifeline.org,
-crisistextline.org, findtreatment.gov, and similar — see `NEVER_SHIELD_HOSTS`
-in `content/shield.js`) are never shielded, regardless of what categories
-you've enabled. A wellbeing filter should not be able to hide the help
-someone is actively looking for.
+**No page content you read is ever sent anywhere.** `chrome.storage.local`
+only, no `host_permissions`, no CSP override, no analytics — and it's written
+so you can verify that yourself rather than take our word for it. See
+[PRIVACY.md](PRIVACY.md) for the full claim, the exact command to check it,
+and the one non-negotiable exception (crisis/harm-reduction sites are never
+shielded, regardless of settings).
 
 ## Known limitations
 
