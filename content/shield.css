@@ -124,7 +124,15 @@
 
 .aurashield-label {
   font-weight: 600;
-  white-space: nowrap;
+  /* No white-space: nowrap here on purpose - the matched-keyword hint below
+     can make this long enough to need to wrap on a narrow card (e.g. the
+     Gentle corner badge), and the overlay's own flex-wrap already handles
+     multi-line layout gracefully. */
+}
+
+.aurashield-match-hint {
+  font-weight: 400;
+  opacity: 0.75;
 }
 
 .aurashield-reveal {

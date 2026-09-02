@@ -42,6 +42,20 @@ const cases = [
 
 for (const [text, expected, why] of cases) {
   test(`matchKeywords: ${why}`, () => {
-    assert.equal(matchKeywords(text, compiled), expected, `text: "${text}"`);
+    const result = matchKeywords(text, compiled);
+    assert.equal(result?.categoryId ?? null, expected, `text: "${text}"`);
   });
 }
+
+test("matchKeywords also reports which keyword matched, for the shield label", () => {
+  const result = matchKeywords("The White House announces a new policy", compiled);
+  assert.equal(result.categoryId, "politics");
+  assert.match(result.matchedKeyword, /white house/i);
+});
+
+test("the reported matched keyword reflects the plural form actually found, not the base keyword", () => {
+  const result = matchKeywords("Republicans and Democrats both agree", compiled);
+  assert.equal(result.categoryId, "politics");
+  // "republican" is the keyword; "Republicans" is what's in the text.
+  assert.match(result.matchedKeyword, /republicans/i);
+});

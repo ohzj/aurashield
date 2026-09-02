@@ -195,9 +195,12 @@
   function matchKeywords(text, compiledCategories) {
     if (!text) return null;
     for (const category of compiledCategories) {
-      if (!category.pattern.test(text)) continue;
+      // No "g" flag on these patterns, so exec() is a stateless single-match
+      // check here, not a stateful iterator - safe to call repeatedly.
+      const match = category.pattern.exec(text);
+      if (!match) continue;
       if (category.excludePattern && category.excludePattern.test(text)) continue;
-      return category.id;
+      return { categoryId: category.id, matchedKeyword: match[0] };
     }
     return null;
   }
@@ -413,7 +416,7 @@
   // ---- content/shield-ui.js ------------------------------------------------
   let labelIdCounter = 0;
 
-  function shieldElement(el, { category, label, intensity, source }) {
+  function shieldElement(el, { category, label, intensity, source, matchedKeyword }) {
     // The element can be removed from the DOM between being queued (e.g. for
     // AI classification) and this call resolving - most commonly on a fast
     // infinite-scroll feed. insertBefore on a detached node throws, and
@@ -452,6 +455,16 @@
     text.className = "aurashield-label";
     text.id = `aurashield-label-${++labelIdCounter}`;
     text.textContent = `Shielded · ${label}`;
+    // Real text content of the same span the reveal button's
+    // aria-describedby points to - so this reaches screen-reader users too,
+    // not just sighted ones. Deliberately not shown for AI-sourced matches,
+    // which have no single term to point to.
+    if (matchedKeyword) {
+      const hint = document.createElement("span");
+      hint.className = "aurashield-match-hint";
+      hint.textContent = ` — matched "${matchedKeyword}"`;
+      text.appendChild(hint);
+    }
 
     // A single real <button> is the only interactive control here - the
     // overlay itself is a plain div, not a second, invalidly-nested
@@ -650,7 +663,7 @@
     async function handleCandidate(el, text) {
       if (!enabled) return;
 
-      let matchId = matchKeywords(text, compiled);
+      let match = matchKeywords(text, compiled);
       let source = "keyword";
 
       // Keyword matches resolve synchronously - nothing to hide in the
@@ -660,19 +673,20 @@
       // instant a candidate is found, before we even know if it'll match.
       // The generic adapter never reaches this branch (aiEligible: false),
       // so an arbitrary page's headings are never queued for inference.
-      if (!matchId && classifier && enabledCategories.length > 0 && adapter.aiEligible !== false) {
+      if (!match && classifier && enabledCategories.length > 0 && adapter.aiEligible !== false) {
         el.classList.add("aurashield-checking");
         try {
-          matchId = await classifier.classify(text, enabledCategories);
+          const categoryId = await classifier.classify(text, enabledCategories);
+          match = categoryId ? { categoryId, matchedKeyword: null } : null;
           source = "ai";
         } catch {
-          matchId = null;
+          match = null;
         }
         el.classList.remove("aurashield-checking");
       }
 
-      if (!matchId) return;
-      const category = categoryById.get(matchId);
+      if (!match) return;
+      const category = categoryById.get(match.categoryId);
       if (!category) return;
 
       shieldElement(el, {
@@ -680,6 +694,7 @@
         label: category.label,
         intensity: category.intensity || "balanced",
         source,
+        matchedKeyword: match.matchedKeyword,
       });
     }
 
