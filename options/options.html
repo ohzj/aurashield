@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>AuraShield Settings</title>
+<link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <span class="brand-icon" aria-hidden="true">&#128737;</span>
+      <div>
+        <h1>AuraShield</h1>
+        <p class="sub">A dial for what you see, not a wall. Nothing here is ever sent off this device.</p>
+      </div>
+    </header>
+
+    <section class="card" id="ai-status">
+      <h2>On-device AI</h2>
+      <p class="ai-status-text" id="ai-status-text">Checking on-device AI…</p>
+      <button type="button" class="btn-primary" id="ai-enable-btn" hidden>Enable on-device AI</button>
+      <progress class="ai-progress" id="ai-progress" max="100" value="0" hidden></progress>
+    </section>
+
+    <section class="card">
+      <h2>Categories</h2>
+      <p class="hint">Toggle a category on, and choose how far its dial goes: Gentle just blurs, Strict hides completely (but always leaves a "N items shielded" strip you can expand).</p>
+      <table class="cat-table" id="category-table">
+        <thead>
+          <tr><th>Enabled</th><th>Category</th><th>Intensity</th><th></th></tr>
+        </thead>
+        <tbody id="category-tbody"></tbody>
+      </table>
+    </section>
+
+    <section class="card">
+      <h2>Add a custom category</h2>
+      <form id="custom-form" class="custom-form">
+        <label class="field">
+          <span>Name</span>
+          <input type="text" id="custom-label" placeholder="e.g. My ex's name" required />
+        </label>
+        <label class="field">
+          <span>Keywords &amp; phrases (comma-separated)</span>
+          <input type="text" id="custom-keywords" placeholder="e.g. layoffs, hiring freeze" required />
+        </label>
+        <label class="field">
+          <span>Intensity</span>
+          <select id="custom-intensity">
+            <option value="gentle">Gentle — peek-through blur</option>
+            <option value="balanced" selected>Balanced — blur + reveal</option>
+            <option value="strict">Strict — fully hidden</option>
+          </select>
+        </label>
+        <button type="submit" class="btn-primary">Add category</button>
+      </form>
+    </section>
+
+    <footer class="foot">
+      <button type="button" class="btn-link" id="reset-btn">Reset to defaults</button>
+    </footer>
+  </div>
+
+  <script type="module" src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Welcome to AuraShield</title>
+<link rel="stylesheet" href="onboarding.css" />
+</head>
+<body>
+  <div class="wrap">
+    <span class="icon" aria-hidden="true">&#128737;</span>
+    <h1>This isn't censorship. It's a dial.</h1>
+    <p class="lede">
+      Most blockers work like a wall: block the domain, hide the app, all-or-nothing.
+      AuraShield works like a dial. You tell it what wears you down, and set how far to
+      push it — from a soft peek-through blur up to fully hidden. Nothing is deleted,
+      nothing is decided for you.
+    </p>
+
+    <div class="levels">
+      <div class="level">
+        <span class="level-name">Gentle</span>
+        <p>A light blur that clears when you hover or focus it — a preview, not a wall.</p>
+      </div>
+      <div class="level">
+        <span class="level-name">Balanced</span>
+        <p>Full blur with a label and a "view anyway" button. One click reveals it.</p>
+      </div>
+      <div class="level">
+        <span class="level-name">Strict</span>
+        <p>Fully hidden — but it collapses into a slim, clickable strip. Nothing vanishes without a trace.</p>
+      </div>
+    </div>
+
+    <div class="privacy-note">
+      <strong>Everything runs on this device.</strong> Topic understanding uses Chrome's
+      built-in Gemini Nano model, running locally. No page you read is ever sent
+      anywhere — that's true whether the on-device model is on or off.
+    </div>
+
+    <a class="btn-primary" id="continue-btn" href="../options/options.html">Choose your categories</a>
+  </div>
+
+  <script type="module" src="onboarding.js"></script>
+</body>
+</html>

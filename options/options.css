@@ -1,0 +1,125 @@
+:root {
+  --ground: #f4f6f3;
+  --surface: #ffffff;
+  --ink: #1b2420;
+  --ink-soft: #4b5850;
+  --line: #dce3dd;
+  --accent: #2f6b5e;
+  --accent-strong: #1e5347;
+  --accent-soft: #dceae5;
+  --urgent: #b14a2a;
+  --urgent-soft: #f5dfd4;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14.5px;
+  line-height: 1.55;
+}
+
+.wrap { max-width: 720px; margin: 0 auto; padding: 40px 24px 80px; }
+
+.head { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 28px; }
+.brand-icon { font-size: 30px; line-height: 1; }
+.head h1 { margin: 0 0 4px; font-size: 24px; }
+.sub { margin: 0; color: var(--ink-soft); font-size: 13.5px; max-width: 46ch; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 20px 22px;
+  margin-bottom: 18px;
+}
+.card h2 { margin: 0 0 10px; font-size: 15px; }
+.hint { color: var(--ink-soft); font-size: 12.5px; margin: 0 0 14px; max-width: 60ch; }
+
+.ai-status-text { margin: 0; font-size: 13px; color: var(--ink-soft); }
+#ai-status.unsupported .ai-status-text, #ai-status.unavailable .ai-status-text { color: var(--urgent); }
+.btn-primary {
+  margin-top: 10px;
+  font: inherit;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+.btn-primary:hover { background: var(--accent-strong); }
+.ai-progress { display: block; width: 100%; margin-top: 10px; accent-color: var(--accent); }
+.ai-progress[hidden] { display: none; }
+
+.cat-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.cat-table th {
+  text-align: left;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--line);
+}
+.cat-table td { padding: 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.cat-table tr:last-child td { border-bottom: none; }
+.cat-table input[type="checkbox"] { accent-color: var(--accent); width: 16px; height: 16px; }
+.cat-table select {
+  font: inherit;
+  font-size: 12.5px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--ground);
+  color: var(--ink);
+}
+.tag-custom {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent-strong);
+  background: var(--accent-soft);
+  padding: 2px 7px;
+  border-radius: 999px;
+  margin-left: 8px;
+}
+.btn-remove {
+  font: inherit;
+  font-size: 12px;
+  color: var(--urgent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.custom-form { display: flex; flex-direction: column; gap: 14px; max-width: 420px; }
+.field { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); }
+.field input, .field select {
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 400;
+  color: var(--ink);
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: var(--ground);
+}
+.field input:focus, .field select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.foot { padding-top: 6px; }
+.btn-link {
+  font: inherit;
+  font-size: 13px;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+}
