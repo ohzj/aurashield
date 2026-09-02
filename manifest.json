@@ -4,7 +4,7 @@
   "version": "0.2.0",
   "manifest_version": 3,
   "description": "A personal, reversible filter for the web. Blur or hide topics you don't want to see, entirely on-device.",
-  "minimum_chrome_version": "138",
+  "minimum_chrome_version": "102",
   "permissions": ["storage", "activeTab"],
   "background": {
     "service_worker": "background/service-worker.js",

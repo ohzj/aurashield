@@ -95,9 +95,13 @@ A wellbeing filter that hides the wrong thing is a hazard, not a feature:
 
 1. Open `chrome://extensions`, enable **Developer mode** (top right).
 2. Click **Load unpacked** and select this folder.
-3. Requires **Chrome 138+**. Pin the AuraShield icon and click it to see
-   today's stats and category toggles; click "Manage categories & intensity"
-   for the full settings page.
+3. Requires **Chrome 102+** to load at all (that's what the `inert` attribute
+   the accessibility work depends on needs) — but **Chrome 138+** for the
+   on-device AI stage specifically. Below 138, AuraShield still installs and
+   filters with the keyword stage; the popup/options AI status will say so
+   plainly rather than pretending the feature exists. Pin the AuraShield icon
+   and click it to see today's stats and category toggles; click "Manage
+   categories & intensity" for the full settings page.
 
 ### Enabling on-device AI (Gemini Nano)
 
